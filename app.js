@@ -1,18 +1,18 @@
 //La firma es el nombre de la función, los parámetros y lo que retorna
-function animateElement(element, start, target, duration){ //Retornará promesa con elemento
-  element.style.right = start; 
+function animateElement(element, start, target, duration, direction){ //Retornará promesa con elemento
+  element.style[direction] = start; 
   let counter = 0;
   const delta = (target - start)*40/duration; //delta es lo que se debe mover por cuadro
   return new Promise((resolve, reject)=>{ // Acá se está declarando la promesa. Los parametros indican lo que resuelven y lo que se rechaza, cuando se resuelve se llama a resolve() y si no se llama a reject()
       const loop = setInterval(()=>{ // toma una funcion y la repite cada ciertos milisegundos
           const current = start + counter++ * delta; //a acá indicamos el movimientoto, ++counter hace que sume y luego se multiplique. Counter ++ suma después. Formula = posición inicial + velocidad*tiempo
-          element.style.right = current;
+          element.style[direction] = current;
           if(start > target && current <= target){ // acá indicamos cuando queremos que finalize el moviento que seria alb llegar a target
-              element.style.right = current;
+              element.style[direction] = current;
               clearInterval(loop); // Acá se termina la promesa
               resolve();//Si queremos pasar una respuesta es a través del parámetro de resolve
           }else if(start < target && current >= target){
-              element.style.right = current;
+              element.style[direction] = current;
               clearInterval(loop); // Acá se termina la promesa
               resolve();//Si queremos pasar una respuesta es a través del parámetro de resolve
           }
@@ -37,20 +37,37 @@ const allLi = document.getElementsByTagName("p");
 }); */
 
 Promise.all( // esto devuelve un arreglo de promesas y ejecutarlas a la vez, se resuelve cuansdo terminan todas las promesas.
+  
   [
-      animateElement(allLi[0], -200, 1100, 5000),      
-      animateElement(allLi[1], -200, 1100, 6000)
+      animateElement(allLi[0], -200, 900, 5000, 'right'),      
+      animateElement(allLi[1], -200, 900, 6000, 'right')
   ]
 ).then((results)=>{
-  console.log("Todas las animaciones terminaron");
+  console.log("Todas las animaciones se mueven a la izquierda");
   return Promise.all( // esto devuelve un arreglo de promesas y ejecutarlas a la vez, se resuelve cuansdo terminan todas las promesas.
       [
-        animateElement(allLi[1], 1000, -200, 7000),
-        animateElement(allLi[0], 1100, -200, 5000)
+        animateElement(allLi[1], 450, 0, 7000, 'top'),
+        animateElement(allLi[0], 0, 500, 5000, 'top')
       ]
   )
 }).then(()=>{
-  console.log("Terminaron las animaciones de vuelta");
+  console.log("Todas las animaciones se mueven arriba y abajo");
+  return Promise.all( // esto devuelve un arreglo de promesas y ejecutarlas a la vez, se resuelve cuansdo terminan todas las promesas.
+      [
+        animateElement(allLi[1], 900, 100, 7000, 'right'),
+        animateElement(allLi[0], 900 , 100, 5000, 'right')
+      ]
+  )
+  
+}).then(()=>{
+  console.log("Termino la carrera");
+  return Promise.all( // esto devuelve un arreglo de promesas y ejecutarlas a la vez, se resuelve cuansdo terminan todas las promesas.
+      [
+        animateElement(allLi[1], 0, 450, 4000, 'top'),
+        animateElement(allLi[0], 450, 0, 5000, 'top')
+      ]
+  )
+  
 }).catch(()=>{
   console.log("Falló la animación");
 });
